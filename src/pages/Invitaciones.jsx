@@ -135,7 +135,7 @@ export default function Invitaciones() {
                   <tr>
                     <th>Nombre</th>
                     <th>Apellido</th>
-                    <th>Participantes</th>
+                    <th>Acompañantes</th>
                     <th>Visto</th>
                     <th>Aceptado</th>
                     <th>Creado</th>
