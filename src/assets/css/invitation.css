@@ -11,12 +11,21 @@ body {
   font-family: 'Times New Roman', serif;
 }
 
+/* Asegurar que la página ocupa siempre el alto de pantalla */
+html, body, #root {
+  height: 100%;
+  min-height: 100vh;
+  /* Soporte moderno para móviles (evita barra de URL variable) */
+  min-height: 100dvh;
+}
+
 .invitation-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 20px;
+  min-height: 100dvh; /* mejor en móviles */
+  padding: 0; /* evitar overflow vertical por padding del contenedor */
   background: radial-gradient(circle, #023e3f 0%, #001a1a 100%); /* Verde aqua oscuro pero diferente al card */
 }
 
@@ -105,11 +114,99 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Pantalla intermedia: mensaje de los padres */
+.parents-screen {
+  position: relative;
+  width: 100%;
+  height: 100vh;   /* usar height con border-box para incluir padding */
+  height: 100dvh;  /* viewport dinámico en móviles */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--inv-text);
+  overflow: hidden; /* prevenir scroll accidental */
+}
+
+.parents-enter { animation: parentsIn 0.8s ease both; }
+.parents-exit { animation: parentsOut 0.7s ease forwards; }
+
+@keyframes parentsIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); filter: blur(2px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes parentsOut {
+  to { opacity: 0; transform: translateY(-10px) scale(0.98); filter: blur(2px); }
+}
+
+.parents-box {
+  max-width: 900px;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 20px rgba(0,0,0,0.25), inset 0 0 20px rgba(212,175,55,0.08);
+  padding: 28px 22px;
+  border-radius: 10px;
+  backdrop-filter: blur(2px);
+  min-height: 320px; /* evitar saltos por crecimiento del texto */
+}
+
+.parents-title {
+  font-size: 1.4rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--inv-gold);
+  margin-bottom: 18px;
+}
+
+.parents-message {
+  font-size: 1.2rem;
+  line-height: 1.9;
+  white-space: pre-line; /* respetar saltos */
+  margin: 0 auto 22px;
+  color: #f2f2f2;
+  position: relative; /* para superponer el texto tipeado */
+  min-height: 10em; /* reserva de altura para evitar reflujo */
+}
+
+.parents-message-ghost {
+  visibility: hidden;
+  margin: 0;
+}
+
+.parents-message .typewriter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* efecto de cursor para el typewriter */
+.typewriter span::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--inv-gold);
+  margin-left: 4px;
+  vertical-align: -0.15em;
+  animation: caretBlink 1s steps(2, start) infinite;
+}
+
+@keyframes caretBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
 .invitation-view {
   background: transparent;
   color: var(--inv-text);
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;

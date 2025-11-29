@@ -10,8 +10,9 @@ export default function Invitacion() {
   const toast = useToast()
   const [inv, setInv] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [showInvitation, setShowInvitation] = useState(false)
+  const [view, setView] = useState('intro') // intro | parents | invitation
   const [introExiting, setIntroExiting] = useState(false)
+  const [parentsExiting, setParentsExiting] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -80,15 +81,27 @@ export default function Invitacion() {
     setIntroExiting(true)
     // Espera a que termine la animación de salida antes de mostrar la tarjeta
     setTimeout(() => {
-      setShowInvitation(true)
+      setView('parents')
     }, 500) // debe coincidir con la duración de .intro-exit en CSS
   }
 
+  // Pantalla intermedia: mensaje de los padres (15s)
+  useEffect(() => {
+    if (view !== 'parents') return
+    let exitTimer
+    exitTimer = setTimeout(() => {
+      setParentsExiting(true)
+      setTimeout(() => setView('invitation'), 700) // coincide con animación de salida
+    }, 15000)
+    return () => { if (exitTimer) clearTimeout(exitTimer) }
+  }, [view])
+
+
   return (
-    <div className={"invitation-container" + (showInvitation ? " invitation-mode" : "") }>
+    <div className={"invitation-container" + (view === 'invitation' ? " invitation-mode" : "") }>
       {loading ? (
         <div className="loading-text">Cargando...</div>
-      ) : !showInvitation ? (
+      ) : view === 'intro' ? (
         <div className={"intro-container" + (introExiting ? " intro-exit" : "") }>
           <img
             className="intro-image"
@@ -98,6 +111,17 @@ export default function Invitacion() {
           <button className="btn-gold" onClick={handleContinue} disabled={introExiting}>
             Continuar
           </button>
+        </div>
+      ) : view === 'parents' ? (
+        <div className={"parents-screen" + (parentsExiting ? " parents-exit" : " parents-enter") }>
+          <div className="parents-box">
+            <div className="parents-title">Con amor de tus padres</div>
+            <ParentsMessage />
+          </div>
+          <div className="corner-decoration corner-top-left"></div>
+          <div className="corner-decoration corner-top-right"></div>
+          <div className="corner-decoration corner-bottom-left"></div>
+          <div className="corner-decoration corner-bottom-right"></div>
         </div>
       ) : (
         <div className="invitation-view card-enter">
@@ -137,4 +161,35 @@ export default function Invitacion() {
       )}
     </div>
   )
+}
+
+// --- Componentes auxiliares ---
+function ParentsMessage() {
+  const message = `Querida Arianna, hoy celebramos tus quince años con el corazón lleno de orgullo y alegría.\nHas crecido con una luz única que ilumina a quienes te rodean.\nQue cada paso que des esté guiado por tus sueños y valores, y que nunca olvides cuánto te amamos.\nSiempre estaremos a tu lado, acompañándote en cada nuevo comienzo.`
+  return (
+    <div className="parents-message">
+      {/* elemento fantasma para ocupar el alto total y evitar saltos */}
+      <p className="parents-message-ghost" aria-hidden>{message}</p>
+      <Typewriter text={message} speed={35} />
+    </div>
+  )
+}
+
+function Typewriter({ text, speed = 35 }) {
+  const [display, setDisplay] = useState('')
+  useEffect(() => {
+    let i = 0
+    let cancelled = false
+    function tick() {
+      if (cancelled) return
+      setDisplay(text.slice(0, i))
+      if (i < text.length) {
+        i++
+        setTimeout(tick, speed)
+      }
+    }
+    tick()
+    return () => { cancelled = true }
+  }, [text, speed])
+  return <p className="typewriter"><span>{display}</span></p>
 }
