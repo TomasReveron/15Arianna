@@ -1,9 +1,21 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 
 export default function GoldenParticles({ count = 28 }) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // En móvil reducimos drásticamente la cantidad para evitar lag
+  const finalCount = isMobile ? 12 : count
+
   // Generamos propiedades aleatorias por partícula (posición, tamaño, duración, delay, opacidad, blur)
   const particles = useMemo(() => {
-    return Array.from({ length: count }).map(() => {
+    return Array.from({ length: finalCount }).map(() => {
       const left = Math.random() * 100
       const size = Math.round(6 + Math.random() * 20) // 6-26px
       const delay = (Math.random() * 6).toFixed(2) + 's'
@@ -13,7 +25,7 @@ export default function GoldenParticles({ count = 28 }) {
       const type = Math.random() > 0.7 ? 'sparkle' : 'dust'
       return { left, size, delay, duration, opacity, blur, type, id: Math.random().toString(36).slice(2) }
     })
-  }, [count])
+  }, [finalCount])
 
   return (
     <div className="golden-particles" aria-hidden>

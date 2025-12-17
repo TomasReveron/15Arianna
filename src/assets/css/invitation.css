@@ -875,15 +875,21 @@ html, body, #root {
   50% { filter: brightness(1.5) drop-shadow(0 0 5px rgba(255,255,255,0.8)); }
 }
 
-/* Reducir intensidad y tamaño en móviles */
-@media (max-width: 520px) {
+@keyframes twinkleOpacity {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* Reducir intensidad y tamaño en móviles para evitar lag */
+@media (max-width: 768px) {
   .gold-particle.sparkle { 
-    box-shadow: none; 
-    filter: drop-shadow(0 0 2px rgba(255,215,0,0.5)); 
-    transform: scale(0.7); /* Reducir tamaño general en móviles */
+    box-shadow: none !important; 
+    filter: none !important;
+    /* Reemplazar animación twinkle pesada por una de opacidad */
+    animation-name: floatParticle, twinkleOpacity;
   }
   .gold-particle.dust {
-    transform: scale(0.8);
+    box-shadow: none !important;
   }
 }
 
