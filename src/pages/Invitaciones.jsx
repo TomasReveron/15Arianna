@@ -4,6 +4,36 @@ import { useToast } from '../context/ToastContext'
 import { supabase } from '../lib/supabase'
 import { logout } from '../utils/auth'
 import { useNavigate } from 'react-router-dom'
+import GoldenParticles from '../components/GoldenParticles'
+
+const RefreshIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 4 23 10 17 10" />
+    <polyline points="1 20 1 14 7 14" />
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+  </svg>
+)
+
+const PlusIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+)
+
+const EyeIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+)
+
+const CopyIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </svg>
+)
 
 export default function Invitaciones() {
   const [rows, setRows] = useState([])
@@ -99,32 +129,31 @@ export default function Invitaciones() {
 
   return (
     <main className="admin-page">
-      <div className="admin-card">
+      <GoldenParticles />
+      <div className="admin-card admin-card--wide">
         <div className="admin-header">
           <h1 style={{display:'flex',alignItems:'center',gap:12, flexWrap: 'wrap'}}>
             <span style={{flex: 1}}>Invitaciones</span>
             <div style={{display:'flex', gap: 8}}>
-              <button className="icon-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} title="Alternar tema" aria-label="Alternar tema">
-                {theme === 'dark' ? (
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.8 1.8-1.8zM1 13h3v-2H1v2zm10 9h2v-3h-2v3zM17.24 4.84l1.8-1.79 1.79 1.79-1.79 1.79-1.8-1.79zM20 11v2h3v-2h-3zM6.76 19.16l-1.8 1.79L3.17 19.16l1.79-1.8 1.8 1.8zM17.24 19.16l1.8 1.79 1.79-1.79-1.79-1.8-1.8 1.8zM12 5a7 7 0 100 14 7 7 0 000-14z" fill="currentColor"/></svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.64 13a9 9 0 11-10.63-10.63A7 7 0 0021.64 13z" fill="currentColor"/></svg>
-                )}
-              </button>
               <button className="icon-btn" onClick={handleLogout} title="Cerrar sesión" aria-label="Cerrar sesión">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
               </button>
             </div>
           </h1>
-          <p className="meta">Lista de invitados</p>
         </div>
 
         <section style={{ marginTop: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-            <div className="meta">Gestiona las invitaciones</div>
-            <div className="buttons">
-              <button className="btn-ghost" onClick={fetchRows} disabled={loading}>{loading ? 'Cargando...' : 'Refrescar'}</button>
-              <button className="btn-primary" onClick={() => setShowModal(true)}>Crear invitación</button>
+            <div className="meta">Lista de Invitados</div>
+            <div className="buttons buttons--compact">
+              <button className="btn-ghost" onClick={fetchRows} disabled={loading}>
+                <span className="btn-icon"><RefreshIcon /></span>
+                <span className="btn-text">{loading ? 'Cargando...' : 'Refrescar'}</span>
+              </button>
+              <button className="btn-primary" onClick={() => setShowModal(true)}>
+                <span className="btn-icon"><PlusIcon /></span>
+                <span className="btn-text">Crear invitación</span>
+              </button>
             </div>
           </div>
 
@@ -155,8 +184,14 @@ export default function Invitaciones() {
                       <td>{r.created_at ? new Date(r.created_at).toLocaleString() : '-'}</td>
                       <td style={{ textAlign: 'right' }}>
                         <div className="actions-inline">
-                          <button className="btn-ghost" onClick={() => viewLink(r.id)} title="Ver invitación" aria-label={`Ver invitación ${r.id}`}>Ver</button>
-                          <button className="btn-primary" style={{ marginLeft: 8 }} onClick={() => copyLink(r.id)} title="Copiar enlace" aria-label={`Copiar enlace ${r.id}`}>Copiar</button>
+                          <button className="btn-ghost" onClick={() => viewLink(r.id)} title="Ver invitación" aria-label={`Ver invitación ${r.id}`}>
+                            <span className="btn-icon"><EyeIcon /></span>
+                            <span className="btn-text">Ver</span>
+                          </button>
+                          <button className="btn-primary" style={{ marginLeft: 8 }} onClick={() => copyLink(r.id)} title="Copiar enlace" aria-label={`Copiar enlace ${r.id}`}>
+                            <span className="btn-icon"><CopyIcon /></span>
+                            <span className="btn-text">Copiar</span>
+                          </button>
                         </div>
                       </td>
                     </tr>

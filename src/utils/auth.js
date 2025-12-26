@@ -2,14 +2,14 @@ import { supabase } from '../lib/supabase'
 
 // Adaptación de utilidades de autenticación para usar Supabase Auth
 
-export async function registerAdmin({ name, email, password }) {
-  if (!name || !email || !password) {
+export async function registerAdmin({ email, password }) {
+  if (!email || !password) {
     return { ok: false, message: 'Todos los campos son obligatorios.' }
   }
 
   // Usamos supabase.auth.signUp
   try {
-    const res = await supabase.auth.signUp({ email, password }, { data: { name } })
+    const res = await supabase.auth.signUp({ email, password })
     if (res.error) return { ok: false, message: res.error.message }
     // res.data.user puede ser nulo si se necesita confirmación por email, devolvemos info mínima
     return { ok: true, message: 'Administrador creado. Revisa tu email si se requiere verificación.', user: res.data.user ?? null }

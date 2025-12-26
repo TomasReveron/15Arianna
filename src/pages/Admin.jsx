@@ -3,10 +3,42 @@ import { registerAdmin, loginAdmin, logout, getSession, getAdmin, isAuthenticate
 import '../assets/css/admin.css'
 import { useToast } from '../context/ToastContext'
 import { useNavigate } from 'react-router-dom'
+import GoldenParticles from '../components/GoldenParticles'
+
+const LoginIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+    <polyline points="10 17 15 12 10 7" />
+    <line x1="15" y1="12" x2="3" y2="12" />
+  </svg>
+)
+
+const RegisterIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="8.5" cy="7" r="4" />
+    <line x1="20" y1="8" x2="20" y2="14" />
+    <line x1="23" y1="11" x2="17" y2="11" />
+  </svg>
+)
+
+const LogoutIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </svg>
+)
+
+const BackIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </svg>
+)
 
 export default function Admin() {
   const [mode, setMode] = useState('login') // 'login' | 'register'
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -44,7 +76,6 @@ export default function Admin() {
   }, [theme])
 
   function clearForm() {
-    setName('')
     setEmail('')
     setPassword('')
     setConfirm('')
@@ -60,7 +91,7 @@ export default function Admin() {
       setLoading(false)
       return setError('Las contraseñas no coinciden.')
     }
-    const res = await registerAdmin({ name: name.trim(), email: email.trim(), password })
+    const res = await registerAdmin({ email: email.trim(), password })
     setLoading(false)
     if (!res.ok) {
       setError(res.message)
@@ -118,32 +149,29 @@ export default function Admin() {
 
   return (
     <main className="admin-page">
+      <GoldenParticles />
       <div className="admin-card">
         <div className="admin-header">
-          <h1 style={{display:'flex',alignItems:'center',gap:12, flexWrap: 'wrap'}}>
-            <span style={{flex: 1}}>Panel de administrador</span>
-            <button className="icon-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} title="Alternar tema" aria-label="Alternar tema">
-              {theme === 'dark' ? (
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.8 1.8-1.8zM1 13h3v-2H1v2zm10 9h2v-3h-2v3zM17.24 4.84l1.8-1.79 1.79 1.79-1.79 1.79-1.8-1.79zM20 11v2h3v-2h-3zM6.76 19.16l-1.8 1.79L3.17 19.16l1.79-1.8 1.8 1.8zM17.24 19.16l1.8 1.79 1.79-1.79-1.79-1.8-1.8 1.8zM12 5a7 7 0 100 14 7 7 0 000-14z" fill="currentColor"/></svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.64 13a9 9 0 11-10.63-10.63A7 7 0 0021.64 13z" fill="currentColor"/></svg>
-              )}
-            </button>
+          <h1>
+            <span>Panel de administrador</span>
           </h1>
         </div>
           <div className="panel">
             {user ? (
               <div className="sessionBox">
-                <h2 style={{margin:0}}>Bienvenido, {user.name}</h2>
+                <h2>Bienvenido</h2>
                 <p className="small">Conectado como <strong>{user.email}</strong></p>
                 <div className="buttons">
-                  <button className="btn-primary" onClick={handleLogout}>Cerrar sesión</button>
+                  <button className="btn-primary" onClick={handleLogout}>
+                    <span className="btn-icon"><LogoutIcon /></span>
+                    <span className="btn-text">Cerrar sesión</span>
+                  </button>
                 </div>
                 <div style={{marginTop:8}} className="small">Sesión iniciada: {new Date(user.startedAt).toLocaleString()}</div>
               </div>
             ) : (
               <>
-                <div className="toggle" style={{marginBottom:12}}>
+                <div className="toggle">
                   <button onClick={() => { setMode('login'); setError(null); setMessage(null) }} disabled={mode==='login'}>Iniciar sesión</button>
                   <button onClick={() => { setMode('register'); setError(null); setMessage(null) }} disabled={mode==='register'}>Registrarse</button>
                 </div>
@@ -153,10 +181,6 @@ export default function Admin() {
 
                 {mode === 'register' ? (
                   <form onSubmit={handleRegister}>
-                    <label>
-                      Nombre
-                      <input value={name} onChange={e => setName(e.target.value)} placeholder="Nombre completo" />
-                    </label>
                     <label>
                       Email
                       <input value={email} onChange={e => setEmail(e.target.value)} placeholder="admin@ejemplo.com" />
@@ -170,8 +194,14 @@ export default function Admin() {
                       <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Confirmar contraseña" />
                     </label>
                     <div className="buttons">
-                      <button className="btn-primary" type="submit" disabled={loading}>{loading ? 'Creando...' : 'Crear administrador'}</button>
-                      <button className="btn-ghost" type="button" onClick={() => { setMode('login'); clearForm() }}>Volver</button>
+                      <button className="btn-primary" type="submit" disabled={loading}>
+                        <span className="btn-icon"><RegisterIcon /></span>
+                        <span className="btn-text">{loading ? 'Creando...' : 'Crear administrador'}</span>
+                      </button>
+                      <button className="btn-ghost" type="button" onClick={() => { setMode('login'); clearForm() }}>
+                        <span className="btn-icon"><BackIcon /></span>
+                        <span className="btn-text">Volver</span>
+                      </button>
                     </div>
                   </form>
                 ) : (
@@ -185,8 +215,14 @@ export default function Admin() {
                       <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Contraseña" />
                     </label>
                     <div className="buttons">
-                      <button className="btn-primary" type="submit" disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
-                      <button className="btn-ghost" type="button" onClick={() => { setMode('register'); clearForm() }} disabled={checkingAdmin ? true : undefined}>Crear cuenta</button>
+                      <button className="btn-primary" type="submit" disabled={loading}>
+                        <span className="btn-icon"><LoginIcon /></span>
+                        <span className="btn-text">{loading ? 'Entrando...' : 'Entrar'}</span>
+                      </button>
+                      <button className="btn-ghost" type="button" onClick={() => { setMode('register'); clearForm() }} disabled={checkingAdmin ? true : undefined}>
+                        <span className="btn-icon"><RegisterIcon /></span>
+                        <span className="btn-text">Crear cuenta</span>
+                      </button>
                     </div>
                   </form>
                 )}
