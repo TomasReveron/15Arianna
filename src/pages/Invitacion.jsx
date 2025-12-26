@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import '../assets/css/invitation.css'
 import GoldenParticles from '../components/GoldenParticles'
@@ -6,6 +7,12 @@ import { useToast } from '../context/ToastContext'
 import { supabase } from '../lib/supabase'
 
 export default function Invitacion() {
+  // ---------------------------------------------------------
+  // CONFIGURACIÓN: Escribe aquí la dirección o las coordenadas (latitud, longitud)
+  // Ejemplo coordenadas: "10.4806, -66.9036"
+  const EVENT_LOCATION = "10.434377, -66.969000" 
+  // ---------------------------------------------------------
+
   const { id } = useParams()
   const navigate = useNavigate()
   const toast = useToast()
@@ -18,6 +25,7 @@ export default function Invitacion() {
   const [invSection, setInvSection] = useState('cover') // 'cover' | 'details'
   const containerRef = useRef(null)
   const [showMapModal, setShowMapModal] = useState(false)
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -131,8 +139,7 @@ export default function Invitacion() {
   }
 
   function handleOpenDetails() {
-    // mostrar más detalles: por ahora navegar a una sección o mostrar un toast
-    toast.add({ title: 'Detalles', message: 'Aquí puedes ver más información sobre el evento', type: 'info' })
+    setShowDetailsModal(true)
   }
 
 
@@ -269,26 +276,6 @@ export default function Invitacion() {
                   </div>
 
                   <div className="action-button">
-                      {/* Map modal overlay */}
-                      {showMapModal && (
-                        <div className="map-modal-overlay" role="dialog" aria-modal="true" onClick={handleCloseMap}>
-                          <div className="map-modal" onClick={(e) => e.stopPropagation()}>
-                            <button className="map-modal-close" onClick={handleCloseMap} aria-label="Cerrar mapa">×</button>
-                            <div className="map-modal-body">
-                              <iframe
-                                title="Mapa del lugar"
-                                className="map-iframe"
-                                src={`https://www.google.com/maps?q=${encodeURIComponent(inv?.location ?? 'Lugar de la celebración Arianna')}&output=embed`}
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                              ></iframe>
-                            </div>
-                            <div className="map-modal-footer">
-                              <button className="btn-gold" onClick={() => { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(inv?.location ?? 'Lugar de la celebración Arianna')}`, '_blank') }}>Abrir en Google Maps</button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
                     <button
                       className="action-btn"
                       onClick={handleOpenMap}
@@ -322,11 +309,128 @@ export default function Invitacion() {
           </div>
         </div>
       )}
+
+      {/* Modals rendered via Portal with exit animations */}
+      <AnimatedModal 
+        isOpen={showMapModal} 
+        onClose={handleCloseMap} 
+        className="inv-modal--map"
+      >
+        <div className="inv-modal-header">
+          <h3 className="inv-modal-title">Ubicación</h3>
+          <button className="inv-modal-close" onClick={handleCloseMap} aria-label="Cerrar mapa">×</button>
+        </div>
+        <div className="inv-modal-body inv-modal-body--map">
+          <iframe
+            title="Mapa del lugar"
+            className="map-iframe"
+            src={`https://www.google.com/maps?q=${encodeURIComponent(inv?.location ?? EVENT_LOCATION)}&output=embed`}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+        <div className="inv-modal-footer" style={{flexDirection: 'column', gap: 10}}>
+          <button className="btn-gold" onClick={() => { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(inv?.location ?? EVENT_LOCATION)}`, '_blank') }}>Abrir en Google Maps App</button>
+          <p style={{margin:0, fontSize:'0.75rem', opacity:0.6, fontFamily:'var(--font-ui)'}}>Recomendado para una mejor experiencia en móviles</p>
+        </div>
+      </AnimatedModal>
+
+      <AnimatedModal 
+        isOpen={showDetailsModal} 
+        onClose={() => setShowDetailsModal(false)}
+      >
+        <div className="inv-modal-header">
+          <h3 className="inv-modal-title">Detalles del Evento</h3>
+          <button className="inv-modal-close" onClick={() => setShowDetailsModal(false)} aria-label="Cerrar detalles">×</button>
+        </div>
+        <div className="inv-modal-body">
+          <div className="detail-list">
+            <div className="detail-item">
+              <div className="detail-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.38 3.4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2zM4 22h16v-3h-2v-2h2v-3h-2v-2h2V9H4v3h2v2H4v3h2v2H4v3zM8 9h8v8H8V9z"/></svg>
+              </div>
+              <div className="detail-content">
+                <h3>Código de Vestimenta</h3>
+                <p>Formal / Elegante. Queremos verte brillar con nosotros.</p>
+              </div>
+            </div>
+            <div className="detail-item">
+              <div className="detail-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+              </div>
+              <div className="detail-content">
+                <h3>Lluvia de Sobres</h3>
+                <p>Tu presencia es nuestro mejor regalo. Si deseas tener un detalle, agradecemos tu aporte en sobre.</p>
+              </div>
+            </div>
+            <div className="detail-item">
+              <div className="detail-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div className="detail-content">
+                <h3>Puntualidad</h3>
+                <p>Agradecemos tu puntualidad para disfrutar juntos de cada momento de la celebración.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="inv-modal-footer">
+          <button className="btn-gold" onClick={() => setShowDetailsModal(false)}>Entendido</button>
+        </div>
+      </AnimatedModal>
     </div>
   )
 }
 
 // --- Componentes auxiliares ---
+function AnimatedModal({ isOpen, onClose, children, className = '' }) {
+  const [render, setRender] = useState(isOpen)
+  const [isClosing, setIsClosing] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      setRender(true)
+      setIsClosing(false)
+    } else if (render) {
+      setIsClosing(true)
+      const timer = setTimeout(() => {
+        setRender(false)
+        setIsClosing(false)
+      }, 300) // Duración de la animación en CSS
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen, render])
+
+  // Bloquear scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (render) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [render])
+
+  if (!render) return null
+
+  return createPortal(
+    <div 
+      className={`inv-modal-overlay ${isClosing ? 'closing' : ''}`} 
+      role="dialog" 
+      aria-modal="true" 
+      onClick={onClose}
+    >
+      <div 
+        className={`inv-modal ${className}`} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>,
+    document.body
+  )
+}
+
 function ParentsMessage() {
   const message = `Querida Arianna, hoy celebramos tus quince años con el corazón lleno de orgullo y alegría.\nHas crecido con una luz única que ilumina a quienes te rodean.\nQue cada paso que des esté guiado por tus sueños y valores, y que nunca olvides cuánto te amamos.\nSiempre estaremos a tu lado, acompañándote en cada nuevo comienzo.`
   return (
