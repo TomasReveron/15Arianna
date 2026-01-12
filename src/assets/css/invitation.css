@@ -1007,18 +1007,43 @@ html, body, #root {
 
 @media (max-width: 600px) {
   .detail-accordion-inner {
-    padding: 0 20px 20px 20px;
-    text-align: center;
+    padding: 10px 20px 20px 20px; /* Un poco de espacio arriba */
+    text-align: left; /* Mejor lectura alineada a la izquierda */
+    font-size: 0.9rem;
   }
   
   .detail-accordion-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 10px;
+    flex-direction: row; /* Mantener fila para parecer lista */
+    text-align: left;
+    gap: 12px;
+    padding: 12px 15px;
+    align-items: center; /* Centrado verticalmente */
+  }
+
+  .detail-accordion-icon {
+    min-width: 36px;
+    height: 36px;
+    padding: 8px;
+  }
+
+  .detail-accordion-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .detail-accordion-title {
+    font-size: 1rem;
   }
   
   .detail-accordion-arrow {
-    display: none; /* Ocultar flecha en móvil para simplificar */
+    display: block; /* Mostrar flecha para indicar interacción */
+    opacity: 0.7;
+    margin-left: auto; /* Empujar a la derecha si hay espacio extra */
+  }
+
+  .detail-accordion-arrow svg {
+    width: 18px;
+    height: 18px; 
   }
 }
 
