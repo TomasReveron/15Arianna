@@ -202,7 +202,6 @@ export default function Invitacion() {
       ) : view === 'parents' ? (
         <div className={"parents-screen" + (parentsExiting ? " parents-exit" : " parents-enter") }>
           <div className="parents-box">
-            <div className="parents-title">Con amor de tus padres</div>
             <ParentsMessage />
           </div>
           <img src="/Esquina.png" className="corner-decoration corner-top-left" alt="Esquina arriba izquierda" />
@@ -227,11 +226,16 @@ export default function Invitacion() {
                   alt="Corona"
                   className="crown-image"
                 />
+                <div className="parents-block">
+                  <p className="parents-intro">Mis padres</p>
+                  <h2 className="parents-names">Alexis Reveron<br/>Merlin Lopez</h2>
+                  <p className="parents-intro">tenemos el honor de invitarles a</p>
+                </div>
                 <h1 className="invitation-name">Mis 15 años</h1>
                 <div className="invitation-divider">
                   <div className="divider-diamond"></div>
                 </div>
-                <div className={"invitation-subtitle" + (invSection === 'details' ? " header-fade-up" : "")}>Arianna Sofía</div>
+                <div className={"invitation-subtitle" + (invSection === 'details' ? " header-fade-up" : "")}>Arianna Sofia</div>
                 <img
                   src="/Diseño_sin_título-removebg-preview.png"
                   alt="Lámpara"
@@ -504,7 +508,7 @@ function AnimatedModal({ isOpen, onClose, children, className = '' }) {
 }
 
 function ParentsMessage() {
-  const message = `Querida Arianna, hoy celebramos tus quince años con el corazón lleno de orgullo y alegría.\nHas crecido con una luz única que ilumina a quienes te rodean.\nQue cada paso que des esté guiado por tus sueños y valores, y que nunca olvides cuánto te amamos.\nSiempre estaremos a tu lado, acompañándote en cada nuevo comienzo.`
+  const message = `Nuestra niña ya pronto será una valiente y hermosa quinceañera, hoy florece como nunca, que la vida te regale caminos llenos de luz. \nHoy agradecemos a Dios por tus 15 años, por la vida que florece en ti y por el camino que empieza a abrirse ante tus pasos.`
   return (
     <div className="parents-message">
       {/* elemento fantasma para ocupar el alto total y evitar saltos */}

@@ -347,6 +347,30 @@ html, body, #root {
   margin-bottom: 25px;
 }
 
+.parents-block {
+  margin-bottom: 15px;
+  animation: fadeIn 1.5s ease both;
+}
+
+.parents-intro {
+  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 5px 0;
+  /* font-family: 'Mustika', serif; <- Eliminado para que herede Times New Roman (como guest-label) */
+  color: #f6e9c7; /* Mismo color que guest-label */
+  opacity: 0.95;
+}
+
+.parents-names {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  /* font-family: 'ChopinScript', cursive; <- Eliminado para que vuelva a la fuente anterior (Times/default) */
+  color: var(--inv-gold);
+  margin: 10px 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
 .crown-image {
   width: clamp(120px, 40vw, 180px);
   max-width: 80vw;
@@ -377,7 +401,7 @@ html, body, #root {
 }
 
 .invitation-name {
-  font-size: clamp(3rem, 10vw, 6.6rem); /* Responsivo: min 3rem, ideal 10vw, max 6.6rem */
+  font-size: clamp(1.5rem, 10vw, 6.6rem); /* Responsivo: min 3rem, ideal 10vw, max 6.6rem */
   margin: 0;
   font-family: 'ChopinScript', cursive, serif;
   color: var(--inv-gold);
@@ -511,7 +535,7 @@ html, body, #root {
 
 .invitation-subtitle {
   font-family: 'Mustika', sans-serif;
-  font-size: clamp(2rem, 6vw, 3.8rem);
+  font-size: 3.6rem;
   color: var(--inv-gold);
   margin-top: clamp(15px, 4vh, 30px);
   margin-bottom: 15px; /* separar de la lámpara */
