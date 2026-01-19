@@ -27,6 +27,8 @@ export default function Invitacion() {
   const [showMapModal, setShowMapModal] = useState(false)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [openDetailId, setOpenDetailId] = useState(null)
+  
+  const audioRef = useRef(null)
 
   useEffect(() => {
     if (!id) return
@@ -103,6 +105,14 @@ export default function Invitacion() {
 
   function handleContinue() {
     if (introExiting) return
+    
+    // Reproducir música al continuar
+    if (audioRef.current) {
+      audioRef.current.play().catch(error => {
+        console.log("Error al reproducir audio:", error)
+      })
+    }
+
     setIntroExiting(true)
     // Espera a que termine la animación de salida antes de mostrar la tarjeta
     setTimeout(() => {
@@ -180,6 +190,9 @@ export default function Invitacion() {
 
   return (
     <div className={"invitation-container" + (view === 'invitation' ? " invitation-mode" : "") }>
+      {/* Elemento de audio oculto */}
+      <audio ref={audioRef} src="/musica.mp3" loop />
+      
       <GoldenParticles />
       {loading ? (
         <div className="loading-text">Cargando...</div>
