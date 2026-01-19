@@ -306,7 +306,7 @@ export default function Invitacion() {
                   })()}
                   <div className="invitation-details-text">
                     <p className="event-datetime">
-                      <span className="event-date">Febrero</span><br/>Sabado <span className="event-day">(28)</span><span className="event-time">8:00 p.m.</span>
+                      <span className="event-date">Febrero</span><br/>Sabado <span className="event-day">28</span><span className="event-time">8:00 p.m.</span>
                     </p>
                   </div>
               </div>
