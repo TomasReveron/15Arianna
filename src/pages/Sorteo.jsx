@@ -119,7 +119,6 @@ function Roulette({ items, onComplete }) {
           position: 'absolute',
           top: '50%',
           left: '50%',
-          transform: 'translate(-50%, -50%)',
           zIndex: 20,
           transition: 'all 0.5s ease',
           opacity: isSpinning ? 0 : 1,
