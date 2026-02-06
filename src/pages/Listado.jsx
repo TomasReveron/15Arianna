@@ -32,7 +32,6 @@ export default function Listado() {
         .from('invitations')
         .select('id, names, participants, accepted, ishere, table')
         .eq('accepted', true)
-        .order('names', { ascending: true })
 
       if (err) throw err
 
@@ -56,6 +55,14 @@ export default function Listado() {
           ishere: !!r.ishere,
           table: r.table || '-'
         }
+      })
+
+      // Ordenar por mesa numéricamente (poniendo los guiones al final)
+      mapped.sort((a, b) => {
+        if (a.table === '-' && b.table === '-') return 0
+        if (a.table === '-') return 1
+        if (b.table === '-') return -1
+        return String(a.table).localeCompare(String(b.table), undefined, { numeric: true })
       })
       
       setInvitados(mapped)
@@ -85,8 +92,9 @@ export default function Listado() {
     }
   }
 
-  const totalAcompañantes = invitados.reduce((acc, curr) => acc + (curr.participants || 0), 0)
-  const totalLlegaron = invitados.filter(inv => inv.ishere).reduce((acc, curr) => acc + (curr.participants || 0), 0)
+  // El total de personas es la suma del titular (1) + sus acompañantes
+  const totalPersonas = invitados.reduce((acc, curr) => acc + 1 + (curr.participants || 0), 0)
+  const totalLlegaron = invitados.filter(inv => inv.ishere).reduce((acc, curr) => acc + 1 + (curr.participants || 0), 0)
 
 
   return (
@@ -105,7 +113,7 @@ export default function Listado() {
             <div className="stats-bar" style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '1rem', color: 'var(--inv-gold)', flexWrap: 'wrap' }}>
               <span><strong>Total Invitaciones:</strong> {invitados.length}</span>
               <span>|</span>
-              <span><strong>Total Personas:</strong> {totalAcompañantes}</span>
+              <span><strong>Total Personas:</strong> {totalPersonas}</span>
               <span>|</span>
               <span><strong>Han llegado:</strong> {totalLlegaron}</span>
             </div>

@@ -58,6 +58,7 @@ export default function Invitaciones() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [participantsInput, setParticipantsInput] = useState(1)
+  const [table, setTable] = useState('')
   const [creating, setCreating] = useState(false)
 
   async function fetchRows() {
@@ -66,7 +67,7 @@ export default function Invitaciones() {
     try {
       const { data, error: err } = await supabase
         .from('invitations')
-        .select('id, names, participants, view, accepted, created_at')
+        .select('id, names, participants, view, accepted, created_at, table')
         .order('created_at', { ascending: false })
 
       if (err) throw err
@@ -91,6 +92,7 @@ export default function Invitaciones() {
           visto: !!r.view,
           aceptado: !!r.accepted,
           created_at: r.created_at,
+          table: r.table || ''
         }
       })
       setRows(mapped)
@@ -163,6 +165,7 @@ export default function Invitaciones() {
                 setFirstName('')
                 setLastName('')
                 setParticipantsInput(1)
+                setTable('')
                 setShowModal(true)
               }}>
                 <span className="btn-icon"><PlusIcon /></span>
@@ -179,6 +182,7 @@ export default function Invitaciones() {
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Acompañantes</th>
+                    <th>Mesa</th>
                     <th>Visto</th>
                     <th>Aceptado</th>
                     <th></th>
@@ -186,12 +190,13 @@ export default function Invitaciones() {
                 </thead>
                 <tbody>
                   {rows.length === 0 ? (
-                    <tr><td colSpan={6} style={{ textAlign: 'center', padding: 24, color: 'var(--muted)' }}>{loading ? 'Cargando...' : 'No hay registros.'}</td></tr>
+                    <tr><td colSpan={7} style={{ textAlign: 'center', padding: 24, color: 'var(--muted)' }}>{loading ? 'Cargando...' : 'No hay registros.'}</td></tr>
                   ) : rows.map(r => (
                     <tr key={r.id}>
                       <td>{r.nombre}</td>
                       <td>{r.apellido}</td>
                       <td>{r.participants ?? '-'}</td>
+                      <td>{r.table || '-'}</td>
                       <td><span className={`badge ${r.visto ? 'badge--true' : 'badge--false'}`}>{r.visto ? 'Sí' : 'No'}</span></td>
                       <td><span className={`badge ${r.aceptado ? 'badge--true' : 'badge--false'}`}>{r.aceptado ? 'Sí' : 'No'}</span></td>
                       <td style={{ textAlign: 'right' }}>
@@ -201,6 +206,7 @@ export default function Invitaciones() {
                             setFirstName(r.nombre)
                             setLastName(r.apellido)
                             setParticipantsInput(r.participants)
+                            setTable(r.table)
                             setShowModal(true)
                           }} title="Editar invitación" style={{ marginRight: 8 }}>
                             <span className="btn-icon"><EditIcon /></span>
@@ -252,7 +258,7 @@ export default function Invitaciones() {
                   // Editar
                   const { error: err } = await supabase
                     .from('invitations')
-                    .update({ names, participants })
+                    .update({ names, participants, table })
                     .eq('id', editingId)
                   
                   if (err) throw err
@@ -261,7 +267,7 @@ export default function Invitaciones() {
                   // Crear
                   const { error: err } = await supabase
                     .from('invitations')
-                    .insert([{ names, participants, view: false, accepted: false }])
+                    .insert([{ names, participants, table, view: false, accepted: false }])
                   
                   if (err) throw err
                   toast.add({ title: 'Creado', message: 'Invitación agregada', type: 'success' })
@@ -271,6 +277,7 @@ export default function Invitaciones() {
                 setFirstName('')
                 setLastName('')
                 setParticipantsInput(1)
+                setTable('')
                 setEditingId(null)
                 fetchRows()
               } catch (err) {
@@ -290,10 +297,16 @@ export default function Invitaciones() {
                   <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Apellido" />
                 </label>
               </div>
-              <label>
-                Participantes
-                <input type="number" min={0} value={participantsInput} onChange={(e) => setParticipantsInput(e.target.value)} />
-              </label>
+              <div className="row">
+                <label style={{flex:1}}>
+                  Participantes
+                  <input type="number" min={0} value={participantsInput} onChange={(e) => setParticipantsInput(e.target.value)} />
+                </label>
+                <label style={{flex:1}}>
+                  Mesa
+                  <input value={table} onChange={(e) => setTable(e.target.value)} placeholder="Ej. A-1" />
+                </label>
+              </div>
               <div className="actions">
                 <button type="button" className="btn-ghost" onClick={() => setShowModal(false)}>Cancelar</button>
                 <button type="submit" className="btn-primary" disabled={creating}>

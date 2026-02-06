@@ -6,6 +6,7 @@ import Admin from './pages/Admin'
 import Invitaciones from './pages/Invitaciones'
 import Invitacion from './pages/Invitacion'
 import Listado from './pages/Listado'
+import Sorteo from './pages/Sorteo'
 import { ToastProvider } from './context/ToastContext'
 
 createRoot(document.getElementById('root')).render(
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/admin" element={<Admin />} />
           <Route path="/invitaciones" element={<Invitaciones />} />
           <Route path="/listado" element={<Listado />} />
+          <Route path="/sorteo" element={<Sorteo />} />
           <Route path="/invitacion/:id" element={<Invitacion />} />
         </Routes>
       </BrowserRouter>
