@@ -145,6 +145,12 @@ export default function Invitaciones() {
           <h1 style={{display:'flex',alignItems:'center',gap:12, flexWrap: 'wrap'}}>
             <span style={{flex: 1}}>Invitaciones</span>
             <div style={{display:'flex', gap: 8}}>
+              <button className="btn-ghost" onClick={() => navigate('/listado')} title="Ver Lista de Asistencia">
+                Lista
+              </button>
+              <button className="btn-ghost" onClick={() => navigate('/sorteo')} title="Ir a Sorteo">
+                Sorteo
+              </button>
               <button className="icon-btn" onClick={handleLogout} title="Cerrar sesión" aria-label="Cerrar sesión">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
               </button>

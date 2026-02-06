@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useNavigate } from 'react-router-dom'
 import '../assets/css/admin.css' // Reutilizamos estilos básicos
 import GoldenParticles from '../components/GoldenParticles'
 
@@ -19,6 +20,7 @@ export default function Listado() {
   const [invitados, setInvitados] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchInvitadosAceptados()
@@ -101,8 +103,15 @@ export default function Listado() {
     <div className="admin-page">
       <GoldenParticles />
       <div className="admin-card admin-card--wide">
-        <div className="admin-header">
+        <div className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1>Listado de Invitados Confirmados</h1>
+          <button 
+              className="btn-ghost" 
+              onClick={() => navigate('/invitaciones')}
+              style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', minWidth: 'auto' }}
+            >
+              ← Volver
+          </button>
         </div>
 
         {loading && <p className="loading-text">Cargando...</p>}

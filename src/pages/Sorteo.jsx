@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
+import { useNavigate } from 'react-router-dom'
 import '../assets/css/admin.css'
 import GoldenParticles from '../components/GoldenParticles'
 
@@ -159,6 +160,7 @@ export default function Sorteo() {
   const [error, setError] = useState(null)
   const [winner, setWinner] = useState(null)
   const [isClosing, setIsClosing] = useState(false)
+  const navigate = useNavigate()
 
   const closeModal = () => {
     setIsClosing(true)
@@ -279,13 +281,21 @@ export default function Sorteo() {
           <h1 style={{ margin: 0 }}>
             {selectedTable ? `Sorteo Mesa ${selectedTable}` : 'Sorteo de Centro de Mesas'}
           </h1>
-          {selectedTable && (
+          {selectedTable ? (
             <button 
               className="btn-ghost" 
               onClick={() => setSelectedTable(null)}
               style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', minWidth: 'auto' }}
             >
               ← Volver
+            </button>
+          ) : (
+             <button 
+              className="btn-ghost" 
+              onClick={() => navigate('/invitaciones')}
+              style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', minWidth: 'auto' }}
+            >
+              ← Menu
             </button>
           )}
         </div>
