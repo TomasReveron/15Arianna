@@ -192,79 +192,90 @@ export default function Sorteo() {
       console.log('Datos crudos recibidos de Supabase:', data)
 
       // Normalización robusta de datos en memoria
-      const validData = (data || []).map(inv => ({
-        ...inv,
-        // Convertir a string y quitar espacios para evitar duplicados " 1" vs "1"
-        safeTable: inv.table ? String(inv.table).trim() : ''
-      })).filter(inv => 
-        inv.safeTable !== '' && 
-        inv.safeTable !== '-'
-      )
-      
-      console.log('Datos válidos procesados (con mesa):', validData)
-
-      // 1. Obtener lista de mesas únicas ordenadas
-
-      // 1. Obtener lista de mesas únicas ordenadas
-      const uniqueMesas = [...new Set(validData.map(d => d.safeTable))]
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-
-      // 2. Agrupar invitados por mesa usando la clave normalizada
-      const agrupados = {}
-      // Inicializar claves para asegurar existencia
-      uniqueMesas.forEach(m => agrupados[m] = [])
-      
-      validData.forEach(inv => {
-        const t = inv.safeTable
-        if (agrupados[t]) {
-          agrupados[t].push(inv.names || 'Invitado')
-        }
-      })
-
-      // Formatear nombres: Solo nombre, o Nombre + Inicial Apellido si se repite el nombre
-      Object.keys(agrupados).forEach(table => {
-        const rawList = agrupados[table]
-        // Parsear para obtener primer nombre y apellido
-        const parsedList = rawList.map(name => {
-          const parts = name.trim().split(/\s+/)
-          const firstName = parts[0]
-          // Tomar todo lo que sobro como posible fuente del apellido, pero cogeremos solo la primera letra del siguiente token
-          // Si el nombre es "Juan Perez", lastNamePart = "Perez". Si "Juan De la Cruz", parts[1] = "De"
-          // El requerimiento dice "primera letra del apellido", asumimos el token inmediato al nombre.
-          const lastNamePart = parts.length > 1 ? parts[1] : '' 
-          return { original: name, firstName, lastNamePart }
-        })
-
-        // Contar ocurrencias de cada firstName
-        const nameCounts = {}
-        parsedList.forEach(p => {
-          const key = p.firstName.toLowerCase()
-          nameCounts[key] = (nameCounts[key] || 0) + 1
-        })
-
-        // Reconstruir lista
-        agrupados[table] = parsedList.map(p => {
-          const key = p.firstName.toLowerCase()
-          if (nameCounts[key] > 1 && p.lastNamePart) {
-            return `${p.firstName} ${p.lastNamePart.charAt(0)}.`
-          }
-          return p.firstName
-        })
-      })
-      
-      // Debug
-      console.log('Mesas detectadas:', uniqueMesas)
-      console.log('Invitados Agrupados por Mesa:', agrupados)
-      console.log('--- FIN DEBUG SORTEO ---')
-
-      setMesas(uniqueMesas)
-      setInvitadosPorMesa(agrupados)
+      processRawInvitations(data)
     } catch (err) {
-      console.error(err)
-      setError('Error al cargar la información del sorteo')
+      console.error('Error cargando desde Supabase:', err)
+      // Intentar fallback a mocks si la consulta falla
+      try {
+        console.log('Sorteo: intentando fallback a mocks...')
+        const mock = await import('../mocks/supabaseMock.js')
+        const rows = await (mock.fetchInvitations ? mock.fetchInvitations({ acceptedOnly: true }) : mock.default.fetchInvitations({ acceptedOnly: true }))
+        console.log('Datos crudos recibidos de mocks:', rows)
+        processRawInvitations(rows)
+      } catch (e) {
+        console.error('Error fallback a mocks:', e)
+        setError('Error al cargar la información del sorteo')
+      }
     } finally {
       setLoading(false)
     }
+  }
+
+  // Extraer la lógica de procesamiento de datos para reutilizar con supabase o mocks
+  function processRawInvitations(data) {
+    // Normalización robusta de datos en memoria
+    const validData = (data || []).map(inv => ({
+      ...inv,
+      // Convertir a string y quitar espacios para evitar duplicados " 1" vs "1"
+      safeTable: inv.table ? String(inv.table).trim() : ''
+    })).filter(inv => 
+      inv.safeTable !== '' && 
+      inv.safeTable !== '-'
+    )
+
+    console.log('Datos válidos procesados (con mesa):', validData)
+
+    // 1. Obtener lista de mesas únicas ordenadas
+    const uniqueMesas = [...new Set(validData.map(d => d.safeTable))]
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+
+    // 2. Agrupar invitados por mesa usando la clave normalizada
+    const agrupados = {}
+    // Inicializar claves para asegurar existencia
+    uniqueMesas.forEach(m => agrupados[m] = [])
+    
+    validData.forEach(inv => {
+      const t = inv.safeTable
+      if (agrupados[t]) {
+        agrupados[t].push(inv.names || 'Invitado')
+      }
+    })
+
+    // Formatear nombres: Solo nombre, o Nombre + Inicial Apellido si se repite el nombre
+    Object.keys(agrupados).forEach(table => {
+      const rawList = agrupados[table]
+      // Parsear para obtener primer nombre y apellido
+      const parsedList = rawList.map(name => {
+        const parts = name.trim().split(/\s+/)
+        const firstName = parts[0]
+        const lastNamePart = parts.length > 1 ? parts[1] : '' 
+        return { original: name, firstName, lastNamePart }
+      })
+
+      // Contar ocurrencias de cada firstName
+      const nameCounts = {}
+      parsedList.forEach(p => {
+        const key = p.firstName.toLowerCase()
+        nameCounts[key] = (nameCounts[key] || 0) + 1
+      })
+
+      // Reconstruir lista
+      agrupados[table] = parsedList.map(p => {
+        const key = p.firstName.toLowerCase()
+        if (nameCounts[key] > 1 && p.lastNamePart) {
+          return `${p.firstName} ${p.lastNamePart.charAt(0)}.`
+        }
+        return p.firstName
+      })
+    })
+    
+    // Debug
+    console.log('Mesas detectadas:', uniqueMesas)
+    console.log('Invitados Agrupados por Mesa:', agrupados)
+    console.log('--- FIN DEBUG SORTEO ---')
+
+    setMesas(uniqueMesas)
+    setInvitadosPorMesa(agrupados)
   }
 
   // Lista de items para la ruleta
