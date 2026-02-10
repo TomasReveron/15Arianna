@@ -198,8 +198,7 @@ export default function Sorteo() {
         safeTable: inv.table ? String(inv.table).trim() : ''
       })).filter(inv => 
         inv.safeTable !== '' && 
-        inv.safeTable !== '-' && 
-        inv.safeTable !== '7'
+        inv.safeTable !== '-'
       )
       
       console.log('Datos válidos procesados (con mesa):', validData)
