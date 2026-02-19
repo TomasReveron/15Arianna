@@ -267,6 +267,12 @@ export default function Sorteo() {
         }
         return p.firstName
       })
+
+      // Caso especial: si la mesa es "3" y tiene exactamente 2 participantes,
+      // duplicamos los nombres para que aparezcan dos veces cada uno
+      if (String(table).trim() === '3' && agrupados[table].length === 2) {
+        agrupados[table] = [...agrupados[table], ...agrupados[table]]
+      }
     })
     
     // Debug
